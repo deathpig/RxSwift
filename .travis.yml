@@ -7,7 +7,7 @@ notifications:
   email: false
 
 script: 
-  - "bundle exec danger --verbose"
   - xcodebuild -version
   - xcodebuild -showsdks
+  - swift --version
   - ./scripts/all-tests.sh
