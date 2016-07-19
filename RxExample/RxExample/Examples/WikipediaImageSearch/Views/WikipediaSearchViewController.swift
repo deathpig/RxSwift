@@ -73,7 +73,7 @@ class WikipediaSearchViewController: ViewController {
                     .retry(3)
                     .retryOnBecomesReachable([], reachabilityService: Dependencies.sharedDependencies.reachabilityService)
                     .startWith([]) // clears results on new search term
-                    .asDriver(onErrorJustReturn: [])
+                    .asDriver([])
             }
             .map { results in
                 results.map(SearchResultViewModel.init)
@@ -107,7 +107,7 @@ class WikipediaSearchViewController: ViewController {
         resultsTableView.rx_modelSelected(SearchResultViewModel.self)
             .asDriver()
             .driveNext { searchResult in
-                wireframe.open(url:searchResult.searchResult.URL)
+                wireframe.open(searchResult.searchResult.URL)
             }
             .addDisposableTo(disposeBag)
     }

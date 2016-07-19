@@ -56,7 +56,7 @@ class RxExample_iOSTests
         let scheduler = TestScheduler(initialClock: 0, resolution: resolution, simulateProcessingDelay: false)
 
         // mock the universe
-        let mockAPI = mockGithubAPI(scheduler: scheduler)
+        let mockAPI = mockGithubAPI(scheduler)
 
         // expected events and test data
         let (
@@ -68,13 +68,13 @@ class RxExample_iOSTests
             expectedValidatedUsernameEvents,
             expectedSignupEnabledEvents
         ) = (
-            scheduler.parseEventsAndTimes(timeline: "e---u1----u2-----u3-----------------", values: stringValues).first!,
-            scheduler.parseEventsAndTimes(timeline: "e----------------------p1-----------", values: stringValues).first!,
-            scheduler.parseEventsAndTimes(timeline: "e---------------------------p2---p1-", values: stringValues).first!,
-            scheduler.parseEventsAndTimes(timeline: "------------------------------------", values: events).first!,
+            scheduler.parseEventsAndTimes("e---u1----u2-----u3-----------------", values: stringValues).first!,
+            scheduler.parseEventsAndTimes("e----------------------p1-----------", values: stringValues).first!,
+            scheduler.parseEventsAndTimes("e---------------------------p2---p1-", values: stringValues).first!,
+            scheduler.parseEventsAndTimes("------------------------------------", values: events).first!,
 
-            scheduler.parseEventsAndTimes(timeline: "e---v--f--v--f---v--o----------------", values: validations).first!,
-            scheduler.parseEventsAndTimes(timeline: "f--------------------------------t---", values: booleans).first!
+            scheduler.parseEventsAndTimes("e---v--f--v--f---v--o----------------", values: validations).first!,
+            scheduler.parseEventsAndTimes("f--------------------------------t---", values: booleans).first!
         )
 
         let wireframe = MockWireframe()
@@ -95,8 +95,8 @@ class RxExample_iOSTests
         )
 
         // run experiment
-        let recordedSignupEnabled = scheduler.record(source: viewModel.signupEnabled)
-        let recordedValidatedUsername = scheduler.record(source: viewModel.validatedUsername)
+        let recordedSignupEnabled = scheduler.record(viewModel.signupEnabled)
+        let recordedValidatedUsername = scheduler.record(viewModel.validatedUsername)
 
         scheduler.start()
 
@@ -109,7 +109,7 @@ class RxExample_iOSTests
         let scheduler = TestScheduler(initialClock: 0, resolution: resolution, simulateProcessingDelay: false)
 
         // mock the universe
-        let mockAPI = mockGithubAPI(scheduler: scheduler)
+        let mockAPI = mockGithubAPI(scheduler)
 
         // expected events and test data
         let (
@@ -121,13 +121,13 @@ class RxExample_iOSTests
             expectedValidatedUsernameEvents,
             expectedSignupEnabledEvents
         ) = (
-            scheduler.parseEventsAndTimes(timeline: "e---u1----u2-----u3-----------------", values: stringValues).first!,
-            scheduler.parseEventsAndTimes(timeline: "e----------------------p1-----------", values: stringValues).first!,
-            scheduler.parseEventsAndTimes(timeline: "e---------------------------p2---p1-", values: stringValues).first!,
-            scheduler.parseEventsAndTimes(timeline: "------------------------------------", values: events).first!,
+            scheduler.parseEventsAndTimes("e---u1----u2-----u3-----------------", values: stringValues).first!,
+            scheduler.parseEventsAndTimes("e----------------------p1-----------", values: stringValues).first!,
+            scheduler.parseEventsAndTimes("e---------------------------p2---p1-", values: stringValues).first!,
+            scheduler.parseEventsAndTimes("------------------------------------", values: events).first!,
 
-            scheduler.parseEventsAndTimes(timeline: "e---v--f--v--f---v--o----------------", values: validations).first!,
-            scheduler.parseEventsAndTimes(timeline: "f--------------------------------t---", values: booleans).first!
+            scheduler.parseEventsAndTimes("e---v--f--v--f---v--o----------------", values: validations).first!,
+            scheduler.parseEventsAndTimes("f--------------------------------t---", values: booleans).first!
         )
 
         let wireframe = MockWireframe()
@@ -135,10 +135,10 @@ class RxExample_iOSTests
 
         let viewModel = GithubSignupViewModel2(
             input: (
-                username: scheduler.createHotObservable(usernameEvents).asDriver(onErrorJustReturn: ""),
-                password: scheduler.createHotObservable(passwordEvents).asDriver(onErrorJustReturn: ""),
-                repeatedPassword: scheduler.createHotObservable(repeatedPasswordEvents).asDriver(onErrorJustReturn: ""),
-                loginTaps: scheduler.createHotObservable(loginTapEvents).asDriver(onErrorJustReturn: ())
+                username: scheduler.createHotObservable(usernameEvents).asDriver(""),
+                password: scheduler.createHotObservable(passwordEvents).asDriver(""),
+                repeatedPassword: scheduler.createHotObservable(repeatedPasswordEvents).asDriver(""),
+                loginTaps: scheduler.createHotObservable(loginTapEvents).asDriver(())
             ),
             dependency: (
                 API: mockAPI,
@@ -156,8 +156,8 @@ class RxExample_iOSTests
         */
         driveOnScheduler(scheduler) {
             // run experiment
-            let recordedSignupEnabled = scheduler.record(source: viewModel.signupEnabled)
-            let recordedValidatedUsername = scheduler.record(source: viewModel.validatedUsername)
+            let recordedSignupEnabled = scheduler.record(viewModel.signupEnabled)
+            let recordedValidatedUsername = scheduler.record(viewModel.validatedUsername)
 
             scheduler.start()
             
@@ -171,9 +171,9 @@ class RxExample_iOSTests
 // MARK: Mocks
 
 extension RxExample_iOSTests {
-    func mockGithubAPI(scheduler: TestScheduler) -> GitHubAPI {
+    func mockGithubAPI(_ scheduler: TestScheduler) -> GitHubAPI {
         return MockGitHubAPI(
-            usernameAvailable: scheduler.mock(values: booleans, errors: errors) { (username) -> String in
+            usernameAvailable: scheduler.mock(booleans, errors: errors) { (username) -> String in
                 if username == "secretusername" {
                     return "---t"
                 }
@@ -184,7 +184,7 @@ extension RxExample_iOSTests {
                     return "---f"
                 }
             },
-            signup: scheduler.mock(values: booleans, errors: errors) { (username, password) -> String in
+            signup: scheduler.mock(booleans, errors: errors) { (username, password) -> String in
                 if username == "secretusername" && password == "secret" {
                     return "--t"
                 }

@@ -29,8 +29,8 @@ class SearchResultViewModel {
 
         let URLs = configureImageURLs()
 
-        self.imageURLs = URLs.asDriver(onErrorJustReturn: [])
-        self.title = configureTitle(URLs).asDriver(onErrorJustReturn: "Error during fetching")
+        self.imageURLs = URLs.asDriver([])
+        self.title = configureTitle(URLs).asDriver("Error during fetching")
     }
 
     // private methods

@@ -19,7 +19,7 @@ class MockWireframe : Wireframe {
         _promptFor = promptFor
     }
 
-    func open(url: URL) {
+    func open(_ url: URL) {
         _openURL(url)
     }
 

@@ -13,7 +13,7 @@ import RxCocoa
 #endif
 
 extension UIScrollView {
-    func  isNearBottomEdge(edgeOffset: CGFloat = 20.0) -> Bool {
+    func  isNearBottomEdge(_ edgeOffset: CGFloat = 20.0) -> Bool {
         return self.contentOffset.y + self.frame.size.height + edgeOffset > self.contentSize.height
     }
 }
@@ -50,7 +50,7 @@ class GitHubSearchRepositoriesViewController: ViewController, UITableViewDelegat
 
         let loadNextPageTrigger = self.tableView.rx_contentOffset
             .flatMap { _ in
-                self.tableView.isNearBottomEdge(edgeOffset: 20.0)
+                self.tableView.isNearBottomEdge(20.0)
                     ? Observable.just(())
                     : Observable.empty()
             }
@@ -63,7 +63,7 @@ class GitHubSearchRepositoriesViewController: ViewController, UITableViewDelegat
                     return Driver.just(RepositoriesState.empty)
                 } else {
                     return GitHubSearchRepositoriesAPI.sharedAPI.search(query, loadNextPageTrigger: loadNextPageTrigger)
-                        .asDriver(onErrorJustReturn: RepositoriesState.empty)
+                        .asDriver(RepositoriesState.empty)
                 }
             }
 

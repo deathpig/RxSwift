@@ -78,7 +78,7 @@ class GithubSignupViewModel2 {
         validatedUsername = input.username
             .flatMapLatest { username in
                 return validationService.validateUsername(username)
-                    .asDriver(onErrorJustReturn: .failed(message: "Error contacting server"))
+                    .asDriver(.failed(message: "Error contacting server"))
             }
 
         validatedPassword = input.password
@@ -97,7 +97,7 @@ class GithubSignupViewModel2 {
             .flatMapLatest { (username, password) in
                 return API.signup(username, password: password)
                     .trackActivity(signingIn)
-                    .asDriver(onErrorJustReturn: false)
+                    .asDriver(false)
             }
             .flatMapLatest { loggedIn -> Driver<Bool> in
                 let message = loggedIn ? "Mock: Signed in to GitHub." : "Mock: Sign in to GitHub failed"
@@ -106,7 +106,7 @@ class GithubSignupViewModel2 {
                     .map { _ in
                         loggedIn
                     }
-                    .asDriver(onErrorJustReturn: false)
+                    .asDriver(false)
             }
 
 

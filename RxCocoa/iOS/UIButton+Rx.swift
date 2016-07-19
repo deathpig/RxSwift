@@ -59,7 +59,7 @@ extension UIButton {
     /**
      Reactive wrapper for `setTitle(_:controlState:)`
      */
-    public func rx_title(controlState: UIControlState = []) -> AnyObserver<String?> {
+    public func rx_title(_ controlState: UIControlState = []) -> AnyObserver<String?> {
         return UIBindingObserver<UIButton, String?>(UIElement: self) { (button, title) -> () in
             button.setTitle(title, for: controlState)
         }.asObserver()

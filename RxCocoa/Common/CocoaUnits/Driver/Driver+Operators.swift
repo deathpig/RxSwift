@@ -290,11 +290,11 @@ extension DriverConvertibleType where E : DriverConvertibleType {
     - returns: The observable sequence that merges the elements of the inner sequences.
     */
     // @warn_unused_result(message:"http://git.io/rxs.uo")
-    public func merge(maxConcurrent: Int)
+    public func merge(_ maxConcurrent: Int)
         -> Driver<E.E> {
         let source = self.asObservable()
             .map { $0.asDriver() }
-            .merge(maxConcurrent: maxConcurrent)
+            .merge(maxConcurrent)
         return Driver<E.E>(source)
     }
 }
@@ -399,7 +399,7 @@ extension Collection where Iterator.Element : DriverConvertibleType {
     */
     // @warn_unused_result(message:"http://git.io/rxs.uo")
     public func zip<R>(_ resultSelector: ([Generator.Element.E]) throws -> R) -> Driver<R> {
-        let source = self.map { $0.asDriver().asObservable() }.zip(resultSelector: resultSelector)
+        let source = self.map { $0.asDriver().asObservable() }.zip(resultSelector)
         return Driver<R>(source)
     }
 }
@@ -415,7 +415,7 @@ extension Collection where Iterator.Element : DriverConvertibleType {
     */
     // @warn_unused_result(message:"http://git.io/rxs.uo")
     public func combineLatest<R>(_ resultSelector: ([Generator.Element.E]) throws -> R) -> Driver<R> {
-        let source = self.map { $0.asDriver().asObservable() }.combineLatest(resultSelector: resultSelector)
+        let source = self.map { $0.asDriver().asObservable() }.combineLatest(resultSelector)
         return Driver<R>(source)
     }
 }

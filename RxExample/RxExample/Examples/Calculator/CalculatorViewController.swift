@@ -99,7 +99,7 @@ class CalculatorViewController: ViewController {
     
 //swifts string api sucks
 
-    func prettyFormat(str: String) -> String {
+    func prettyFormat(_ str: String) -> String {
         if str.hasSuffix(".0") {
 //            return str[str.startIndex..<str.endIndex.pre]
         }

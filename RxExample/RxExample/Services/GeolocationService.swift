@@ -35,7 +35,7 @@ class GeolocationService {
                     .rx_didChangeAuthorizationStatus
                     .startWith(status)
             }
-            .asDriver(onErrorJustReturn: CLAuthorizationStatus.notDetermined)
+            .asDriver(CLAuthorizationStatus.notDetermined)
             .map {
                 switch $0 {
                 case .authorizedAlways:
@@ -46,7 +46,7 @@ class GeolocationService {
             }
         
         location = locationManager.rx_didUpdateLocations
-            .asDriver(onErrorJustReturn: [])
+            .asDriver([])
             .flatMap {
                 return $0.last.map(Driver.just) ?? Driver.empty()
             }

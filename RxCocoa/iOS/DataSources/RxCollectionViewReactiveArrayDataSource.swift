@@ -20,7 +20,7 @@ class _RxCollectionViewReactiveArrayDataSource
     , UICollectionViewDataSource {
     
     @objc(numberOfSectionsInCollectionView:)
-    func numberOfSections(in: UICollectionView) -> Int {
+    func numberOfSections(_ in: UICollectionView) -> Int {
         return 1
     }
 
