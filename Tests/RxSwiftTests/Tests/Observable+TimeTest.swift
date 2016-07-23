@@ -542,7 +542,7 @@ extension ObservableTimeTest {
 
         let expectCompleted = expectation(description: "It will complete")
 
-        let d = Observable<Int64>.interval(0, scheduler: scheduler).takeWhile { $0 < 10 } .subscribe(onNext: { t in
+        let d = Observable<Int64>.interval(0, scheduler: scheduler).takeWhile { $0 < 10 } .subscribe({ t in
             observer.on(.next(t))
         }, onCompleted: {
             expectCompleted.fulfill()
@@ -1008,7 +1008,7 @@ extension ObservableTimeTest {
         
         
         let res = scheduler.start {
-            xs.buffer(timeSpan: 70, count: 3, scheduler: scheduler).map { EquatableArray($0) }
+            xs.buffer(70, count: 3, scheduler: scheduler).map { EquatableArray($0) }
         }
         
         XCTAssertEqual(res.events, [
@@ -1044,7 +1044,7 @@ extension ObservableTimeTest {
             ])
         
         let res = scheduler.start {
-            xs.buffer(timeSpan: 70, count: 3, scheduler: scheduler).map { EquatableArray($0) }
+            xs.buffer(70, count: 3, scheduler: scheduler).map { EquatableArray($0) }
         }
         
         XCTAssertEqual(res.events, [
@@ -1079,7 +1079,7 @@ extension ObservableTimeTest {
             ])
         
         let res = scheduler.start(370) {
-            xs.buffer(timeSpan: 70, count: 3, scheduler: scheduler).map { EquatableArray($0) }
+            xs.buffer(70, count: 3, scheduler: scheduler).map { EquatableArray($0) }
         }
         
         XCTAssertEqual(res.events, [
@@ -1096,8 +1096,8 @@ extension ObservableTimeTest {
     func testBufferWithTimeOrCount_Default() {
         let backgroundScheduler = SerialDispatchQueueScheduler(globalConcurrentQueueQOS: .default)
         
-        let result = try! Observable.range(start: 1, count: 10, scheduler: backgroundScheduler)
-            .buffer(timeSpan: 1000, count: 3, scheduler: backgroundScheduler)
+        let result = try! Observable.range(1, count: 10, scheduler: backgroundScheduler)
+            .buffer(1000, count: 3, scheduler: backgroundScheduler)
             .skip(1)
             .toBlocking()
             .first()
@@ -1126,7 +1126,7 @@ extension ObservableTimeTest {
             ])
         
         let res = scheduler.start { () -> Observable<String> in
-            let window: Observable<Observable<Int>> = xs.window(timeSpan: 70, count: 3, scheduler: scheduler)
+            let window: Observable<Observable<Int>> = xs.window(70, count: 3, scheduler: scheduler)
             let mappedWithIndex = window.mapWithIndex { (o: Observable<Int>, i: Int) -> Observable<String> in
                 return o.map { (e: Int) -> String in
                     return "\(i) \(e)"
@@ -1171,7 +1171,7 @@ extension ObservableTimeTest {
             ])
         
         let res = scheduler.start { () -> Observable<String> in
-            let window: Observable<Observable<Int>> = xs.window(timeSpan: 70, count: 3, scheduler: scheduler)
+            let window: Observable<Observable<Int>> = xs.window(70, count: 3, scheduler: scheduler)
             let mappedWithIndex = window.mapWithIndex { (o: Observable<Int>, i: Int) -> Observable<String> in
                 return o.map { (e: Int) -> String in
                     return "\(i) \(e)"
@@ -1217,7 +1217,7 @@ extension ObservableTimeTest {
             ])
         
         let res = scheduler.start(370) { () -> Observable<String> in
-            let window: Observable<Observable<Int>> = xs.window(timeSpan: 70, count: 3, scheduler: scheduler)
+            let window: Observable<Observable<Int>> = xs.window(70, count: 3, scheduler: scheduler)
             let mappedWithIndex = window.mapWithIndex { (o: Observable<Int>, i: Int) -> Observable<String> in
                 return o.map { (e: Int) -> String in
                     return "\(i) \(e)"
@@ -1296,8 +1296,8 @@ extension ObservableTimeTest {
     func windowWithTimeOrCount_Default() {
         let backgroundScheduler = SerialDispatchQueueScheduler(globalConcurrentQueueQOS: .default)
         
-        let result = try! Observable.range(start: 1, count: 10, scheduler: backgroundScheduler)
-            .window(timeSpan: 1000, count: 3, scheduler: backgroundScheduler)
+        let result = try! Observable.range(1, count: 10, scheduler: backgroundScheduler)
+            .window(1000, count: 3, scheduler: backgroundScheduler)
             .mapWithIndex { (o: Observable<Int>, i: Int) -> Observable<String> in
                 return o.map { (e: Int) -> String in
                     return "\(i) \(e)"

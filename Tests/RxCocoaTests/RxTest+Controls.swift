@@ -27,7 +27,7 @@ extension RxTest {
 
             let disposable = variable.asObservable().bindTo(property)
 
-            _ = property.subscribe(onNext: { n in
+            _ = property.subscribe({ n in
                 lastReturnedPropertyValue = n
             }, onCompleted: {
                 completed = true
@@ -71,7 +71,7 @@ extension RxTest {
             let (control, disposable) = createControl()
             let eventObservable = eventSelector(control)
 
-            _ = eventObservable.subscribe(onNext: { n in
+            _ = eventObservable.subscribe({ n in
 
             }, onCompleted: {
                 completed = true

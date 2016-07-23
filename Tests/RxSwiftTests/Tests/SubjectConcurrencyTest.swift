@@ -13,7 +13,7 @@ import XCTest
 
 class ReplaySubjectConcurrencyTest : SubjectConcurrencyTest {
     override func createSubject() -> (Observable<Int>, AnyObserver<Int>) {
-        let s = ReplaySubject<Int>.create(bufferSize: 1)
+        let s = ReplaySubject<Int>.create(1)
         return (s.asObservable(), AnyObserver(eventHandler: s.asObserver().on))
     }
 }

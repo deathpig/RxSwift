@@ -203,7 +203,7 @@ extension DelegateProxyTest {
         var deallocated = false
 
         autoreleasepool {
-            _ = control.test.subscribe(onNext: { value in
+            _ = control.test.subscribe({ value in
                 receivedValue = value
             }, onCompleted: {
                 completed = true

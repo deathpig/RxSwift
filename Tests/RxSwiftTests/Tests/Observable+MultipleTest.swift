@@ -1628,7 +1628,7 @@ extension ObservableMultipleTest {
             Observable.of(0, 1, 2),
             Observable.of(0, 1, 2),
             Observable.of(0, 1, 2)
-        ).merge(maxConcurrent: 1)
+        ).merge(1)
         
         _ = observable.subscribeNext { n in
             nEvents += 1
@@ -1644,7 +1644,7 @@ extension ObservableMultipleTest {
             Observable.of(0, 1, 2),
             [Observable.of(0, 1), Observable.error(testError)].concat(),
             Observable.of(0, 1, 2)
-        ).merge(maxConcurrent: 1)
+        ).merge(1)
         
         _ = observable.subscribeError { n in
             nEvents += 1
@@ -1658,7 +1658,7 @@ extension ObservableMultipleTest {
         
         let observable: Observable<Observable<Int>> = Observable.just(
             Observable.error(testError)
-        ).merge(maxConcurrent: 1)
+        ).merge(1)
 
         _ = observable.subscribeError { n in
             nEvents += 1
@@ -1670,7 +1670,7 @@ extension ObservableMultipleTest {
     func testMergeConcurrent_DeadlockEmpty() {
         var nEvents = 0
         
-        let observable: Observable<Int> = Observable<Observable<Int>>.empty().merge(maxConcurrent: 1)
+        let observable: Observable<Int> = Observable<Observable<Int>>.empty().merge(1)
 
         _ = observable.subscribeCompleted {
             nEvents += 1
@@ -1682,7 +1682,7 @@ extension ObservableMultipleTest {
     func testMergeConcurrent_DeadlockFirstEmpty() {
         var nEvents = 0
         
-        let observable: Observable<Int> = Observable.just(Observable.empty()).merge(maxConcurrent: 1)
+        let observable: Observable<Int> = Observable.just(Observable.empty()).merge(1)
 
         _ = observable.subscribeCompleted { n in
             nEvents += 1
@@ -2001,7 +2001,7 @@ extension ObservableMultipleTest {
             ])
         
         let res = scheduler.start {
-            xs.merge(maxConcurrent: 2)
+            xs.merge(2)
         }
         
         let messages = [
@@ -2079,7 +2079,7 @@ extension ObservableMultipleTest {
             ])
         
         let res = scheduler.start {
-            xs.merge(maxConcurrent: 2)
+            xs.merge(2)
         }
         
         let messages = [
@@ -2157,7 +2157,7 @@ extension ObservableMultipleTest {
             ])
         
         let res = scheduler.start {
-            xs.merge(maxConcurrent: 3)
+            xs.merge(3)
         }
         
         let messages = [
@@ -2235,7 +2235,7 @@ extension ObservableMultipleTest {
             ])
         
         let res = scheduler.start {
-            xs.merge(maxConcurrent: 3)
+            xs.merge(3)
         }
         
         let messages = [
@@ -2313,7 +2313,7 @@ extension ObservableMultipleTest {
             ])
         
         let res = scheduler.start(450) {
-            xs.merge(maxConcurrent: 2)
+            xs.merge(2)
         }
         
         let messages = [
@@ -2386,7 +2386,7 @@ extension ObservableMultipleTest {
             ])
         
         let res = scheduler.start {
-            xs.merge(maxConcurrent: 2)
+            xs.merge(2)
         }
         
         let messages = [
@@ -2459,7 +2459,7 @@ extension ObservableMultipleTest {
             ])
         
         let res = scheduler.start {
-            xs.merge(maxConcurrent: 2)
+            xs.merge(2)
         }
         
         let messages = [

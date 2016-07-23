@@ -45,7 +45,7 @@ extension ObserverTests {
         var errorNotification: ErrorProtocol!
 
         _ = a.subscribe(
-            onNext: { n in elements.append(n) },
+            { n in elements.append(n) },
             onError: { e in
                 errorNotification = e
             }

@@ -18,7 +18,7 @@ class ReplaySubjectTest: RxTest {
 
         var subject: ReplaySubject<Int>! = nil
 
-        scheduler.scheduleAt(100) { subject = ReplaySubject.create(bufferSize: 1) }
+        scheduler.scheduleAt(100) { subject = ReplaySubject.create(1) }
         scheduler.scheduleAt(250) { XCTAssertFalse(subject.hasObservers) }
 
         scheduler.start()
@@ -32,7 +32,7 @@ class ReplaySubjectTest: RxTest {
         let results1 = scheduler.createObserver(Int.self)
         var subscription1: Disposable! = nil
 
-        scheduler.scheduleAt(100) { subject = ReplaySubject.create(bufferSize: 1) }
+        scheduler.scheduleAt(100) { subject = ReplaySubject.create(1) }
         scheduler.scheduleAt(250) { XCTAssertFalse(subject.hasObservers) }
         scheduler.scheduleAt(300) { subscription1 = subject.subscribe(results1) }
         scheduler.scheduleAt(350) { XCTAssertTrue(subject.hasObservers) }
@@ -56,7 +56,7 @@ class ReplaySubjectTest: RxTest {
         let results3 = scheduler.createObserver(Int.self)
         var subscription3: Disposable! = nil
 
-        scheduler.scheduleAt(100) { subject = ReplaySubject.create(bufferSize: 1) }
+        scheduler.scheduleAt(100) { subject = ReplaySubject.create(1) }
         scheduler.scheduleAt(250) { XCTAssertFalse(subject.hasObservers) }
         scheduler.scheduleAt(300) { subscription1 = subject.subscribe(results1) }
         scheduler.scheduleAt(301) { subscription2 = subject.subscribe(results2) }

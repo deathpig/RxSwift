@@ -18,7 +18,7 @@ class RxButtonTests: RxTest {
         let button = UIButton(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
 
         XCTAssertFalse(button.title(for: []) == "normal")
-        _ = Observable.just("normal").subscribe(button.rx_title(controlState: []))
+        _ = Observable.just("normal").subscribe(button.rx_title([]))
         XCTAssertTrue(button.title(for: []) == "normal")
     }
 
@@ -26,7 +26,7 @@ class RxButtonTests: RxTest {
         let button = UIButton(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
 
         XCTAssertFalse(button.title(for: .selected) == "normal")
-        _ = Observable.just("normal").subscribe(button.rx_title(controlState: .selected))
+        _ = Observable.just("normal").subscribe(button.rx_title(.selected))
         XCTAssertTrue(button.title(for: .selected) == "normal")
     }
 

@@ -448,7 +448,7 @@ extension SentMessageTest {
         let target = SentMessageTest_forwarding_basic()
         var messages = [[AnyObject]]()
 
-        let d = target.rx_sentMessage(#selector(SentMessageTestBase_shared.message_allSupportedParameters(_:p2:p3:p4:p5:p6:p7:p8:p9:p10:p11:p12:p13:p14:p15:p16:))).subscribe(onNext: { n in
+        let d = target.rx_sentMessage(#selector(SentMessageTestBase_shared.message_allSupportedParameters(_:p2:p3:p4:p5:p6:p7:p8:p9:p10:p11:p12:p13:p14:p15:p16:))).subscribe({ n in
                 messages.append(n)
             }, onError: { e in
                 XCTFail("Errors out \(e)")
@@ -612,7 +612,7 @@ extension SentMessageTest {
 
             target.justCalledBool(toSay: true)
 
-            messages.subscribe(onNext: { n in
+            messages.subscribe({ n in
                 recordedMessages.append(n)
             }, onCompleted: {
                 completed = true
@@ -636,7 +636,7 @@ extension SentMessageTest {
 
         var called = false
         var completed = false
-        _ = deallocSequence.subscribe(onNext: { n in
+        _ = deallocSequence.subscribe({ n in
             called = true
         }, onCompleted: {
             completed = true
@@ -656,7 +656,7 @@ extension SentMessageTest {
 
         var called = false
         var completed = false
-        _ = deallocSequence.subscribe(onNext: { n in
+        _ = deallocSequence.subscribe({ n in
             called = true
         }, onCompleted: {
             completed = true
@@ -897,7 +897,7 @@ extension SentMessageTest {
         let action: () -> Disposable = { () -> Disposable in
             let target = SentMessageTest_all_supported_types()
 
-            let d = target.rx_sentMessage(selector).subscribe(onNext: { n in
+            let d = target.rx_sentMessage(selector).subscribe({ n in
                     observedMessages.append(n)
                 }, onError: { e in
                     XCTFail("Errors out \(e)")
@@ -1006,7 +1006,7 @@ extension SentMessageTest {
                 let index = i
                 i += 1
                 recordedParameters.append([])
-                _ = o.subscribe(onNext: { n in
+                _ = o.subscribe({ n in
                         recordedParameters[index].append(n)
                     }, onError: { e in
                         XCTFail("Error happened \(e)")

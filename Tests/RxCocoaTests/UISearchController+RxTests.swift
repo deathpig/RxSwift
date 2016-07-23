@@ -24,7 +24,7 @@ class UISearchController_RxTests: RxTest {
             let searchController = UISearchController()
             
             _ = searchController.rx_didDismiss
-                .subscribe(onNext: {
+                .subscribe({
                         didDismissed = true
                     }, onCompleted: {
                         completed = true
@@ -44,7 +44,7 @@ class UISearchController_RxTests: RxTest {
             let searchController = UISearchController()
             
             _ = searchController.rx_didPresent
-                .subscribe(onNext: {
+                .subscribe({
                     didPresent = true
                     }, onCompleted: {
                         completed = true
@@ -64,7 +64,7 @@ class UISearchController_RxTests: RxTest {
             let searchController = UISearchController()
             
             _ = searchController.rx_present
-                .subscribe(onNext: {
+                .subscribe({
                     presented = true
                     }, onCompleted: {
                         completed = true
@@ -84,7 +84,7 @@ class UISearchController_RxTests: RxTest {
             let searchController = UISearchController()
             
             _ = searchController.rx_willDismiss
-                .subscribe(onNext: {
+                .subscribe({
                     willDismiss = true
                     }, onCompleted: {
                         completed = true
@@ -104,7 +104,7 @@ class UISearchController_RxTests: RxTest {
             let searchController = UISearchController()
             
             _ = searchController.rx_willPresent
-                .subscribe(onNext: {
+                .subscribe({
                     willPresent = true
                     }, onCompleted: {
                         completed = true

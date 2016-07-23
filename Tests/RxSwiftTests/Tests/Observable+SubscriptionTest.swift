@@ -22,7 +22,7 @@ class ObservableSubscriptionTests : RxTest {
         var lastElement: Int? = nil
         var lastError: ErrorProtocol? = nil
 
-        let subscription = publishSubject.subscribe(onNext: { n in
+        let subscription = publishSubject.subscribe({ n in
                 lastElement = n
                 onNextCalled += 1
             }, onError: { e in
@@ -72,7 +72,7 @@ class ObservableSubscriptionTests : RxTest {
         var lastElement: Int? = nil
         var lastError: ErrorProtocol? = nil
 
-        let subscription = publishSubject.subscribe(onNext: { n in
+        let subscription = publishSubject.subscribe({ n in
                 lastElement = n
                 onNextCalled += 1
             }, onError: { e in
@@ -123,7 +123,7 @@ class ObservableSubscriptionTests : RxTest {
         var lastElement: Int? = nil
         var lastError: ErrorProtocol? = nil
 
-        let subscription = publishSubject.subscribe(onNext: { n in
+        let subscription = publishSubject.subscribe({ n in
             lastElement = n
             onNextCalled += 1
             }, onError: { e in
@@ -174,7 +174,7 @@ class ObservableSubscriptionTests : RxTest {
         var lastElement: Int? = nil
         var lastError: ErrorProtocol? = nil
 
-        let subscription = publishSubject.subscribe(onNext: { n in
+        let subscription = publishSubject.subscribe({ n in
             lastElement = n
             onNextCalled += 1
             }, onError: { e in

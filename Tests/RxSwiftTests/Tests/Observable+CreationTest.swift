@@ -221,7 +221,7 @@ extension ObservableCreationTests {
         let scheduler = TestScheduler(initialClock: 0)
         
         let res = scheduler.start {
-            Observable.generate(initialState: 0, condition: { x in x <= 3 }, scheduler: scheduler) { x in
+            Observable.generate(0, condition: { x in x <= 3 }, scheduler: scheduler) { x in
                 x + 1
             }
         }
@@ -240,7 +240,7 @@ extension ObservableCreationTests {
         let scheduler = TestScheduler(initialClock: 0)
         
         let res = scheduler.start {
-            Observable.generate(initialState: 0, condition: { _ in throw testError }, scheduler: scheduler) { x in
+            Observable.generate(0, condition: { _ in throw testError }, scheduler: scheduler) { x in
                 x + 1
             }
         }
@@ -255,7 +255,7 @@ extension ObservableCreationTests {
         let scheduler = TestScheduler(initialClock: 0)
         
         let res = scheduler.start {
-            Observable.generate(initialState: 0, condition: { _ in true }, scheduler: scheduler) { (_: Int) -> Int in
+            Observable.generate(0, condition: { _ in true }, scheduler: scheduler) { (_: Int) -> Int in
                 throw testError
             }
         }
@@ -271,7 +271,7 @@ extension ObservableCreationTests {
         let scheduler = TestScheduler(initialClock: 0)
         
         let res = scheduler.start(203) {
-            Observable.generate(initialState: 0, condition: { _ in true }, scheduler: scheduler) { x in
+            Observable.generate(0, condition: { _ in true }, scheduler: scheduler) { x in
                 x + 1
             }
         }
@@ -288,12 +288,12 @@ extension ObservableCreationTests {
     
         var elements = [Int]()
         
-        _ = Observable.generate(initialState: 0, condition: { _ in true }) { x in
+        _ = Observable.generate(0, condition: { _ in true }) { x in
                 count += 1
                 return x + 1
             }
             .take(4)
-            .subscribe(onNext: { x in
+            .subscribe({ x in
                 elements.append(x)
             })
         
@@ -308,7 +308,7 @@ extension ObservableCreationTests {
         let scheduler = TestScheduler(initialClock: 0)
         
         let res = scheduler.start {
-            Observable.range(start: Int.max, count: 1, scheduler: scheduler)
+            Observable.range(Int.max, count: 1, scheduler: scheduler)
         }
         
         XCTAssertEqual(res.events, [
@@ -321,7 +321,7 @@ extension ObservableCreationTests {
         let scheduler = TestScheduler(initialClock: 0)
         
         let res = scheduler.start(204) {
-            Observable.range(start: -10, count: 5, scheduler: scheduler)
+            Observable.range(-10, count: 5, scheduler: scheduler)
         }
         
         XCTAssertEqual(res.events, [

@@ -46,7 +46,7 @@ class VariableTest : RxTest {
 
         var latest = 0
         var completed = false
-        _ = a.asObservable().subscribe(onNext: { n in
+        _ = a.asObservable().subscribe({ n in
                 latest = n
             }, onCompleted: {
                 completed = true
