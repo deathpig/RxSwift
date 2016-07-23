@@ -62,7 +62,7 @@ func <-> (textInput: RxTextInput, variable: Variable<String>) -> Disposable {
 
              and you hit "Done" button on keyboard.
              */
-            if let nonMarkedTextValue = nonMarkedTextValue , nonMarkedTextValue != variable.value {
+            if let nonMarkedTextValue = nonMarkedTextValue, nonMarkedTextValue != variable.value {
                 variable.value = nonMarkedTextValue
             }
         }, onCompleted:  {
