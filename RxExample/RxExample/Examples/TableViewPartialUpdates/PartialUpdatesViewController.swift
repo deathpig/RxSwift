@@ -85,11 +85,11 @@ class PartialUpdatesViewController : ViewController {
         skinTableViewDataSource(reloadDataSource)
 
         self.sections.asObservable()
-            .bindTo(partialUpdatesTableViewOutlet.rx_itemsWithDataSource(tvAnimatedDataSource))
+            .bindTo(partialUpdatesTableViewOutlet.rx_items(dataSource: tvAnimatedDataSource))
             .addDisposableTo(disposeBag)
 
         self.sections.asObservable()
-            .bindTo(reloadTableViewOutlet.rx_itemsWithDataSource(reloadDataSource))
+            .bindTo(reloadTableViewOutlet.rx_items(dataSource: reloadDataSource))
             .addDisposableTo(disposeBag)
 
         // Collection view logic works, but when clicking fast because of internal bugs
@@ -115,23 +115,23 @@ class PartialUpdatesViewController : ViewController {
             let cvReloadDataSource = RxCollectionViewSectionedReloadDataSource<NumberSection>()
             skinCollectionViewDataSource(cvReloadDataSource)
             self.sections.asObservable()
-                .bindTo(partialUpdatesCollectionViewOutlet.rx_itemsWithDataSource(cvReloadDataSource))
+                .bindTo(partialUpdatesCollectionViewOutlet.rx_items(dataSource: cvReloadDataSource))
                 .addDisposableTo(disposeBag)
         #endif
 
         // touches
 
         partialUpdatesCollectionViewOutlet.rx_itemSelected
-            .subscribeNext { [weak self] i in
+            .subscribe(onNext: { [weak self] i in
                 print("Let me guess, it's .... It's \(self?.generator.sections[i.section].items[i.item]), isn't it? Yeah, I've got it.")
-            }
+            })
             .addDisposableTo(disposeBag)
 
         Observable.of(partialUpdatesTableViewOutlet.rx_itemSelected, reloadTableViewOutlet.rx_itemSelected)
             .merge()
-            .subscribeNext { [weak self] i in
+            .subscribe(onNext: { [weak self] i in
                 print("I have a feeling it's .... \(self?.generator.sections[i.section].items[i.item])?")
-            }
+            })
             .addDisposableTo(disposeBag)
     }
 

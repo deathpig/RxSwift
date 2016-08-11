@@ -41,7 +41,7 @@ extension TestScheduler {
     - `|` marks sequence completed
 
     */
-    func parseEventsAndTimes<T>(_ timeline: String, values: [String: T], errors: [String: ErrorProtocol] = [:]) -> [[Recorded<Event<T>>]] {
+    func parseEventsAndTimes<T>(timeline: String, values: [String: T], errors: [String: Swift.Error] = [:]) -> [[Recorded<Event<T>>]] {
         //print("parsing: \(timeline)")
         typealias RecordedEvent = Recorded<Event<T>>
         
@@ -96,8 +96,8 @@ extension TestScheduler {
 
      - returns: Driver specified by timeline and values.
     */
-    func createDriver<T>(_ timeline: String, values: [String: T]) -> Driver<T> {
-        return createObservable(timeline, values: values, errors: [:]).asDriver({ (error) -> Driver<T> in
+    func createDriver<T>(timeline: String, values: [String: T]) -> Driver<T> {
+        return createObservable(timeline: timeline, values: values, errors: [:]).asDriver(onErrorRecover: { (error) -> Driver<T> in
             fatalError("This can't error out")
             return Driver.never()
         })
@@ -112,8 +112,8 @@ extension TestScheduler {
 
      - returns: Observable sequence specified by timeline and values.
     */
-    func createObservable<T>(_ timeline: String, values: [String: T], errors: [String: ErrorProtocol] = [:]) -> Observable<T> {
-        let events = self.parseEventsAndTimes(timeline, values: values, errors: errors)
+    func createObservable<T>(timeline: String, values: [String: T], errors: [String: Swift.Error] = [:]) -> Observable<T> {
+        let events = self.parseEventsAndTimes(timeline: timeline, values: values, errors: errors)
         return createObservable(events)
     }
 
@@ -150,13 +150,13 @@ extension TestScheduler {
             let scheduledEvents = events[attemptCount].map { event in
                 return self.scheduleRelative((), dueTime: resolution * TimeInterval(event.time)) { _ in
                     observer.on(event.value)
-                    return  NopDisposable.instance
+                    return  Disposables.create()
                 }
             }
 
             attemptCount += 1
 
-            return CompositeDisposable(disposables: scheduledEvents)
+            return Disposables.create(scheduledEvents)
         }
     }
 
@@ -174,11 +174,11 @@ extension TestScheduler {
      - returns: Implementation of method that accepts arguments with parameter `Arg` and returns observable sequence
         with parameter `Ret`.
      */
-    func mock<Arg, Ret>(_ values: [String: Ret], errors: [String: ErrorProtocol] = [:], timelineSelector: (Arg) -> String) -> (Arg) -> Observable<Ret> {
+    func mock<Arg, Ret>(values: [String: Ret], errors: [String: Swift.Error] = [:], timelineSelector: (Arg) -> String) -> (Arg) -> Observable<Ret> {
         return { (parameters: Arg) -> Observable<Ret> in
             let timeline = timelineSelector(parameters)
 
-            return self.createObservable(timeline, values: values, errors: errors)
+            return self.createObservable(timeline: timeline, values: values, errors: errors)
         }
     }
 
@@ -188,7 +188,7 @@ extension TestScheduler {
      - parameter source: Observable sequence to observe.
      - returns: Observer that records all events for observable sequence.
     */
-    func record<O: ObservableConvertibleType>(_ source: O) -> TestableObserver<O.E> {
+    func record<O: ObservableConvertibleType>(source: O) -> TestableObserver<O.E> {
         let observer = self.createObserver(O.E.self)
         let disposable = source.asObservable().bindTo(observer)
         self.scheduleAt(100000) {

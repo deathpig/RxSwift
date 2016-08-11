@@ -26,7 +26,7 @@ class SimpleTableViewExampleViewController : ViewController {
         ])
 
         items
-            .bindTo(tableView.rx_itemsWithCellIdentifier("Cell", cellType: UITableViewCell.self)) { (row, element, cell) in
+            .bindTo(tableView.rx_items(cellIdentifier: "Cell", cellType: UITableViewCell.self)) { (row, element, cell) in
                 cell.textLabel?.text = "\(element) @ row \(row)"
             }
             .addDisposableTo(disposeBag)
@@ -34,16 +34,16 @@ class SimpleTableViewExampleViewController : ViewController {
 
         tableView
             .rx_modelSelected(String.self)
-            .subscribeNext { value in
+            .subscribe(onNext:  { value in
                 DefaultWireframe.presentAlert("Tapped `\(value)`")
-            }
+            })
             .addDisposableTo(disposeBag)
 
         tableView
             .rx_itemAccessoryButtonTapped
-            .subscribeNext { indexPath in
+            .subscribe(onNext: { indexPath in
                 DefaultWireframe.presentAlert("Tapped Detail @ \(indexPath.section),\(indexPath.row)")
-            }
+            })
             .addDisposableTo(disposeBag)
 
     }

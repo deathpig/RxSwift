@@ -33,7 +33,7 @@ class Parent : NSObject {
         super.init()
         
         self.rx_observe(String.self, "val", options: [.initial, .new], retainSelf: false)
-            .subscribeNext(callback)
+            .subscribe(onNext: callback)
             .addDisposableTo(disposeBag)
     }
     
@@ -48,7 +48,7 @@ class Child : NSObject {
     init(parent: ParentWithChild, callback: (String?) -> Void) {
         super.init()
         parent.rx_observe(String.self, "val", options: [.initial, .new], retainSelf: false)
-            .subscribeNext(callback)
+            .subscribe(onNext: callback)
             .addDisposableTo(disposeBag)
     }
     
@@ -144,7 +144,7 @@ extension KVOObservableTests {
         
         var latest: String?
         
-        let d = os .subscribeNext { latest = $0 }
+        let d = os.subscribe(onNext: { latest = $0 })
         
         XCTAssertTrue(latest == nil)
         
@@ -178,7 +178,7 @@ extension KVOObservableTests {
         
         var latest: String?
         
-        let d = os .subscribeNext { latest = $0 }
+        let d = os.subscribe(onNext: { latest = $0 })
         
         XCTAssertTrue(latest == "0")
         
@@ -212,7 +212,7 @@ extension KVOObservableTests {
         
         var latest: String?
         
-        let d = os .subscribeNext { latest = $0 }
+        let d = os.subscribe(onNext: { latest = $0 })
         
         XCTAssertTrue(latest == "0")
         
@@ -241,56 +241,56 @@ extension KVOObservableTests {
     
     func test_ObserveAndDontRetainWorks() {
         var latest: String?
-        var disposed = false
+        var isDisposed = false
         
         var parent: Parent! = Parent { n in
             latest = n
         }
         
         _ = parent.rx_deallocated
-            .subscribeCompleted {
-                disposed = true
-            }
+            .subscribe(onCompleted: {
+                isDisposed = true
+            })
         
         XCTAssertTrue(latest == "")
-        XCTAssertTrue(disposed == false)
+        XCTAssertTrue(isDisposed == false)
         
         parent.val = "1"
         
         XCTAssertTrue(latest == "1")
-        XCTAssertTrue(disposed == false)
+        XCTAssertTrue(isDisposed == false)
         
         parent = nil
         
         XCTAssertTrue(latest == "1")
-        XCTAssertTrue(disposed == true)
+        XCTAssertTrue(isDisposed == true)
     }
     
     func test_ObserveAndDontRetainWorks2() {
         var latest: String?
-        var disposed = false
+        var isDisposed = false
         
         var parent: ParentWithChild! = ParentWithChild { n in
             latest = n
         }
         
         _ = parent.rx_deallocated
-            .subscribeCompleted {
-                disposed = true
-        }
+            .subscribe(onCompleted: {
+                isDisposed = true
+            })
         
         XCTAssertTrue(latest == "")
-        XCTAssertTrue(disposed == false)
+        XCTAssertTrue(isDisposed == false)
         
         parent.val = "1"
         
         XCTAssertTrue(latest == "1")
-        XCTAssertTrue(disposed == false)
+        XCTAssertTrue(isDisposed == false)
         
         parent = nil
         
         XCTAssertTrue(latest == "1")
-        XCTAssertTrue(disposed == true)
+        XCTAssertTrue(isDisposed == true)
     }
 }
 
@@ -301,109 +301,109 @@ extension KVOObservableTests {
     
     func testObserveWeak_SimpleStrongProperty() {
         var latest: String?
-        var disposed = false
+        var isDisposed = false
         
         var root: HasStrongProperty! = HasStrongProperty()
         
         _ = root.rx_observeWeakly(String.self, "property")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
         
         _ = root.rx_deallocated
-            .subscribeCompleted {
-                disposed = true
-            }
+            .subscribe(onCompleted: {
+                isDisposed = true
+            })
         
         XCTAssertTrue(latest == nil)
-        XCTAssertTrue(!disposed)
+        XCTAssertTrue(!isDisposed)
         
         root.property = "a"
 
         XCTAssertTrue(latest == "a")
-        XCTAssertTrue(!disposed)
+        XCTAssertTrue(!isDisposed)
         
         root = nil
 
         XCTAssertTrue(latest == nil)
-        XCTAssertTrue(disposed)
+        XCTAssertTrue(isDisposed)
     }
     
     func testObserveWeak_SimpleWeakProperty() {
         var latest: String?
-        var disposed = false
+        var isDisposed = false
         
         var root: HasWeakProperty! = HasWeakProperty()
         
         _ = root.rx_observeWeakly(String.self, "property")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-        }
+        })
         
         _ = root.rx_deallocated
-            .subscribeCompleted {
-                disposed = true
-        }
+            .subscribe(onCompleted: {
+                isDisposed = true
+        })
         
         XCTAssertTrue(latest == nil)
-        XCTAssertTrue(!disposed)
+        XCTAssertTrue(!isDisposed)
     
         let a: NSString! = "a"
         
         root.property = a
         
         XCTAssertTrue(latest == "a")
-        XCTAssertTrue(!disposed)
+        XCTAssertTrue(!isDisposed)
         
         root = nil
         
         XCTAssertTrue(latest == nil)
-        XCTAssertTrue(disposed)
+        XCTAssertTrue(isDisposed)
     }
 
     func testObserveWeak_ObserveFirst_Weak_Strong_Basic() {
         var latest: String?
-        var disposed = false
+        var isDisposed = false
         
         var child: HasStrongProperty! = HasStrongProperty()
         
         var root: HasWeakProperty! = HasWeakProperty()
         
         _ = root.rx_observeWeakly(String.self, "property.property")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
         
         _ = root.rx_deallocated
-            .subscribeCompleted {
-                disposed = true
-            }
+            .subscribe(onCompleted: {
+                isDisposed = true
+            })
         
         XCTAssertTrue(latest == nil)
-        XCTAssertTrue(disposed == false)
+        XCTAssertTrue(isDisposed == false)
         
         root.property = child
         
         XCTAssertTrue(latest == nil)
-        XCTAssertTrue(disposed == false)
+        XCTAssertTrue(isDisposed == false)
         
         let one: NSString! = "1"
         
         child.property = one
         
         XCTAssertTrue(latest == "1")
-        XCTAssertTrue(disposed == false)
+        XCTAssertTrue(isDisposed == false)
         
         root = nil
         child = nil
      
         XCTAssertTrue(latest == nil)
-        XCTAssertTrue(disposed == true)
+        XCTAssertTrue(isDisposed == true)
     }
     
     func testObserveWeak_Weak_Strong_Observe_Basic() {
         var latest: String?
-        var disposed = false
+        var isDisposed = false
         
         var child: HasStrongProperty! = HasStrongProperty()
         
@@ -416,71 +416,71 @@ extension KVOObservableTests {
         child.property = one
         
         XCTAssertTrue(latest == nil)
-        XCTAssertTrue(disposed == false)
+        XCTAssertTrue(isDisposed == false)
         
         _ = root.rx_observeWeakly(String.self, "property.property")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-        }
+        })
         
         _ = root.rx_deallocated
-            .subscribeCompleted {
-                disposed = true
-        }
+            .subscribe(onCompleted: {
+                isDisposed = true
+        })
         
         XCTAssertTrue(latest == "1")
-        XCTAssertTrue(disposed == false)
+        XCTAssertTrue(isDisposed == false)
         
         root = nil
         child = nil
         
         XCTAssertTrue(latest == nil)
-        XCTAssertTrue(disposed == true)
+        XCTAssertTrue(isDisposed == true)
     }
     
     func testObserveWeak_ObserveFirst_Strong_Weak_Basic() {
         var latest: String?
-        var disposed = false
+        var isDisposed = false
         
         var child: HasWeakProperty! = HasWeakProperty()
         
         var root: HasStrongProperty! = HasStrongProperty()
         
         _ = root.rx_observeWeakly(String.self, "property.property")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-        }
+        })
         
         _ = root.rx_deallocated
-            .subscribeCompleted {
-                disposed = true
-        }
+            .subscribe(onCompleted: {
+                isDisposed = true
+        })
         
         XCTAssertTrue(latest == nil)
-        XCTAssertTrue(disposed == false)
+        XCTAssertTrue(isDisposed == false)
         
         root.property = child
         
         XCTAssertTrue(latest == nil)
-        XCTAssertTrue(disposed == false)
+        XCTAssertTrue(isDisposed == false)
         
         let one: NSString! = "1"
         
         child.property = one
         
         XCTAssertTrue(latest == "1")
-        XCTAssertTrue(disposed == false)
+        XCTAssertTrue(isDisposed == false)
         
         root = nil
         child = nil
         
         XCTAssertTrue(latest == nil)
-        XCTAssertTrue(disposed == true)
+        XCTAssertTrue(isDisposed == true)
     }
     
     func testObserveWeak_Strong_Weak_Observe_Basic() {
         var latest: String?
-        var disposed = false
+        var isDisposed = false
         
         var child: HasWeakProperty! = HasWeakProperty()
         
@@ -493,26 +493,26 @@ extension KVOObservableTests {
         child.property = one
         
         XCTAssertTrue(latest == nil)
-        XCTAssertTrue(disposed == false)
+        XCTAssertTrue(isDisposed == false)
         
         _ = root.rx_observeWeakly(String.self, "property.property")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
         
         _ = root.rx_deallocated
-            .subscribeCompleted {
-                disposed = true
-        }
+            .subscribe(onCompleted: {
+                isDisposed = true
+        })
         
         XCTAssertTrue(latest == "1")
-        XCTAssertTrue(disposed == false)
+        XCTAssertTrue(isDisposed == false)
         
         root = nil
         child = nil
         
         XCTAssertTrue(latest == nil)
-        XCTAssertTrue(disposed == true)
+        XCTAssertTrue(isDisposed == true)
     }
     
     // compiler won't release weak references otherwise :(
@@ -536,9 +536,9 @@ extension KVOObservableTests {
             
             let observable = root.rx_observeWeakly(NSObject.self, "property.property")
             _ = observable
-                .subscribeNext { n in
+                .subscribe(onNext: { n in
                     latest = n
-                }
+                })
             
             XCTAssertTrue(latest! === one)
          
@@ -553,9 +553,9 @@ extension KVOObservableTests {
         var gone = false
         let (child, latest, dealloc) = _testObserveWeak_Strong_Weak_Observe_NilLastPropertyBecauseOfWeak()
         _ = dealloc
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 gone = true
-            }
+            })
         
         XCTAssertTrue(gone)
         XCTAssertTrue(child.property == nil)
@@ -579,9 +579,9 @@ extension KVOObservableTests {
             
             let observable = root.rx_observeWeakly(NSObject.self, "property.property.property")
             _ = observable
-                .subscribeNext { n in
+                .subscribe(onNext: { n in
                     latest = n
-                }
+                })
             
             XCTAssertTrue(latest == nil)
             
@@ -602,9 +602,9 @@ extension KVOObservableTests {
         var gone = false
         
         _ = deallocatedMiddle
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 gone = true
-            }
+            })
         
         XCTAssertTrue(gone)
         XCTAssertTrue(root.property == nil)
@@ -622,9 +622,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_observeWeakly(String.self, "property")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
        
         XCTAssertTrue(latest == "a")
      
@@ -632,9 +632,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
         
         root = nil
         
@@ -653,9 +653,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_observeWeakly(String.self, "property", options: .new)
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
         
         XCTAssertTrue(latest == nil)
         
@@ -667,9 +667,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
         
         root = nil
         
@@ -687,9 +687,9 @@ extension KVOObservableTests {
         XCTAssertTrue(latest == nil)
         
         let disposable = root.rx_observe(NSRect.self, "frame")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
         XCTAssertTrue(latest == root.frame)
         
         root.frame = NSRect(x: -2, y: 0, width: 0, height: 1)
@@ -700,9 +700,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
         
         root = nil
         
@@ -723,9 +723,9 @@ extension KVOObservableTests {
         XCTAssertTrue(latest == nil)
         
         let d = root.rx_observe(CGSize.self, "frame")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
 
         defer {
             d.dispose()
@@ -741,9 +741,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
         
         root = nil
         
@@ -759,9 +759,9 @@ extension KVOObservableTests {
         XCTAssertTrue(latest == nil)
         
         let d = root.rx_observe(CGRect.self, "frame")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
 
         defer {
             d.dispose()
@@ -777,9 +777,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
         
         root = nil
         
@@ -795,9 +795,9 @@ extension KVOObservableTests {
         XCTAssertTrue(latest == nil)
         
         let d = root.rx_observe(CGSize.self, "size")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
 
         defer {
             d.dispose()
@@ -813,9 +813,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
         
         root = nil
         
@@ -831,9 +831,9 @@ extension KVOObservableTests {
         XCTAssertTrue(latest == nil)
         
         let d = root.rx_observe(CGPoint.self, "point")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
         defer {
             d.dispose()
         }
@@ -848,9 +848,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
         
         root = nil
         
@@ -868,9 +868,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_observeWeakly(CGRect.self, "frame")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
         XCTAssertTrue(latest == root.frame)
         
         root.frame = CGRect(x: -2, y: 0, width: 0, height: 1)
@@ -881,9 +881,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
         
         root = nil
         
@@ -900,9 +900,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_observeWeakly(CGSize.self, "size")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
         XCTAssertTrue(latest == root.size)
         
         root.size = CGSize(width: 56, height: 1)
@@ -913,9 +913,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
         
         root = nil
         
@@ -932,9 +932,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_observeWeakly(CGPoint.self, "point")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
         
         XCTAssertTrue(latest == root.point)
         
@@ -946,9 +946,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
         
         root = nil
         
@@ -965,9 +965,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_observeWeakly(NSNumber.self, "integer")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n?.intValue
-            }
+            })
         XCTAssertTrue(latest == root.integer)
         
         root.integer = 10
@@ -978,9 +978,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
         
         root = nil
         
@@ -991,12 +991,12 @@ extension KVOObservableTests {
     func testObserveWeak_PropertyDoesntExist() {
         var root: HasStrongProperty! = HasStrongProperty()
         
-        var lastError: ErrorProtocol? = nil
+        var lastError: Swift.Error? = nil
         
         _ = root.rx_observeWeakly(NSNumber.self, "notExist")
-            .subscribeError { error in
+            .subscribe(onError: { error in
                 lastError = error
-            }
+            })
         
         XCTAssertTrue(lastError != nil)
         lastError = nil
@@ -1005,9 +1005,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
         
         root = nil
         
@@ -1017,12 +1017,12 @@ extension KVOObservableTests {
     func testObserveWeak_HierarchyPropertyDoesntExist() {
         var root: HasStrongProperty! = HasStrongProperty()
         
-        var lastError: ErrorProtocol? = nil
+        var lastError: Swift.Error? = nil
         
         _ = root.rx_observeWeakly(NSNumber.self, "property.notExist")
-            .subscribeError { error in
+            .subscribe(onError: { error in
                 lastError = error
-            }
+            })
         
         XCTAssertTrue(lastError == nil)
         
@@ -1034,9 +1034,9 @@ extension KVOObservableTests {
         
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
         
         root = nil
         
@@ -1056,9 +1056,9 @@ extension KVOObservableTests {
         XCTAssertTrue(latest == nil)
 
         let disposable = root.rx_observe(Int.self, "integer")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
         XCTAssertTrue(latest == 1)
 
         root.integer = 2
@@ -1069,9 +1069,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
 
         root = nil
 
@@ -1089,9 +1089,9 @@ extension KVOObservableTests {
         XCTAssertTrue(latest == nil)
 
         let disposable = root.rx_observe(UInt.self, "uinteger")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-        }
+        })
         XCTAssertTrue(latest == 1)
 
         root.uinteger = 2
@@ -1102,9 +1102,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-        }
+            })
 
         root = nil
 
@@ -1126,9 +1126,9 @@ extension KVOObservableTests {
 
             _ = root
                 .rx_observeWeakly(Int.self, "integer")
-                .subscribeNext { n in
+                .subscribe(onNext: { n in
                     latest = n
-                }
+                })
 
             XCTAssertTrue(latest == 1)
 
@@ -1140,9 +1140,9 @@ extension KVOObservableTests {
 
             _ = root
                 .rx_deallocated
-                .subscribeCompleted {
+                .subscribe(onCompleted: {
                     rootDeallocated = true
-            }
+                })
             
             root = nil
             
@@ -1159,9 +1159,9 @@ extension KVOObservableTests {
 
             _ = root
                 .rx_observeWeakly(UInt.self, "uinteger")
-                .subscribeNext { n in
+                .subscribe(onNext: { n in
                     latest = n
-            }
+                })
 
             XCTAssertTrue(latest == 1)
 
@@ -1173,9 +1173,9 @@ extension KVOObservableTests {
 
             _ = root
                 .rx_deallocated
-                .subscribeCompleted {
+                .subscribe(onCompleted: {
                     rootDeallocated = true
-            }
+                })
 
             root = nil
 
@@ -1195,9 +1195,9 @@ extension KVOObservableTests {
         XCTAssertTrue(latest == nil)
 
         let disposable = root.rx_observe(IntEnum.self, "intEnum")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
         XCTAssertTrue(latest == .one)
 
         root.intEnum = .two
@@ -1208,9 +1208,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
 
         root = nil
 
@@ -1228,9 +1228,9 @@ extension KVOObservableTests {
         XCTAssertTrue(latest == nil)
 
         let disposable = root.rx_observe(Int32Enum.self, "int32Enum")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-        }
+        })
         XCTAssertTrue(latest == .one)
 
         root.int32Enum = .two
@@ -1241,9 +1241,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-        }
+            })
 
         root = nil
 
@@ -1261,9 +1261,9 @@ extension KVOObservableTests {
         XCTAssertTrue(latest == nil)
 
         let disposable = root.rx_observe(Int64Enum.self, "int64Enum")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-        }
+        })
         XCTAssertTrue(latest == .one)
 
         root.int64Enum = .two
@@ -1274,9 +1274,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-        }
+            })
 
         root = nil
 
@@ -1295,9 +1295,9 @@ extension KVOObservableTests {
         XCTAssertTrue(latest == nil)
 
         let disposable = root.rx_observe(UIntEnum.self, "uintEnum")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
         XCTAssertTrue(latest == .one)
 
         root.uintEnum = .two
@@ -1308,9 +1308,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
 
         root = nil
 
@@ -1328,9 +1328,9 @@ extension KVOObservableTests {
         XCTAssertTrue(latest == nil)
 
         let disposable = root.rx_observe(UInt32Enum.self, "uint32Enum")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-        }
+        })
         XCTAssertTrue(latest == .one)
 
         root.uint32Enum = .two
@@ -1341,9 +1341,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-        }
+            })
 
         root = nil
 
@@ -1361,9 +1361,9 @@ extension KVOObservableTests {
         XCTAssertTrue(latest == nil)
 
         let disposable = root.rx_observe(UInt64Enum.self, "uint64Enum")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-        }
+        })
         XCTAssertTrue(latest == .one)
 
         root.uint64Enum = .two
@@ -1374,9 +1374,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-        }
+            })
 
         root = nil
 
@@ -1398,9 +1398,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_observeWeakly(IntEnum.self, "intEnum")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
         XCTAssertTrue(latest == .one)
 
         root.intEnum = .two
@@ -1411,9 +1411,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
 
         root = nil
 
@@ -1430,9 +1430,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_observeWeakly(Int32Enum.self, "int32Enum")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-        }
+        })
         XCTAssertTrue(latest == .one)
 
         root.int32Enum = .two
@@ -1443,9 +1443,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-        }
+            })
 
         root = nil
 
@@ -1462,9 +1462,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_observeWeakly(Int64Enum.self, "int64Enum")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-        }
+        })
         XCTAssertTrue(latest == .one)
 
         root.int64Enum = .two
@@ -1475,9 +1475,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-        }
+            })
 
         root = nil
 
@@ -1494,9 +1494,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_observeWeakly(UIntEnum.self, "uintEnum")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-            }
+            })
         XCTAssertTrue(latest == .one)
 
         root.uintEnum = .two
@@ -1507,9 +1507,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-            }
+            })
 
         root = nil
 
@@ -1526,9 +1526,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_observeWeakly(UInt32Enum.self, "uint32Enum")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-        }
+        })
         XCTAssertTrue(latest == .one)
 
         root.uint32Enum = .two
@@ -1539,9 +1539,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-        }
+            })
 
         root = nil
 
@@ -1558,9 +1558,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_observeWeakly(UInt32Enum.self, "uint64Enum")
-            .subscribeNext { n in
+            .subscribe(onNext: { n in
                 latest = n
-        }
+        })
         XCTAssertTrue(latest == .one)
 
         root.uint64Enum = .two
@@ -1571,9 +1571,9 @@ extension KVOObservableTests {
 
         _ = root
             .rx_deallocated
-            .subscribeCompleted {
+            .subscribe(onCompleted: {
                 rootDeallocated = true
-        }
+            })
 
         root = nil
 

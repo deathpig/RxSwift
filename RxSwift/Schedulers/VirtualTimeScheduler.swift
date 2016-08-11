@@ -128,7 +128,7 @@ public class VirtualTimeScheduler<Converter: VirtualTimeConverterType>
 
         _schedulerQueue.enqueue(item)
         
-        _ = compositeDisposable.addDisposable(item)
+        _ = compositeDisposable.insert(item)
         
         return compositeDisposable
     }
@@ -169,7 +169,7 @@ public class VirtualTimeScheduler<Converter: VirtualTimeConverterType>
 
     func findNext() -> VirtualSchedulerItem<VirtualTime>? {
         while let front = _schedulerQueue.peek() {
-            if front.disposed {
+            if front.isDisposed {
                 _schedulerQueue.remove(front)
                 continue
             }
@@ -263,8 +263,8 @@ class VirtualSchedulerItem<Time>
     let time: Time
     let id: Int
 
-    var disposed: Bool {
-        return disposable.disposed
+    var isDisposed: Bool {
+        return disposable.isDisposed
     }
     
     var disposable = SingleAssignmentDisposable()
