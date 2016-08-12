@@ -185,7 +185,7 @@ extension DriverConvertibleType {
     public func `do`(onNext: ((E) -> Void)? = nil, onError: ((Swift.Error) -> Void)? = nil, onCompleted: (() -> Void)? = nil)
         -> Driver<E> {
         let source = self.asObservable()
-            .doOn(onNext: onNext, onError: onError, onCompleted: onCompleted)
+            .do(onNext: onNext, onError: onError, onCompleted: onCompleted)
 
         return Driver(source)
     }
